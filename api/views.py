@@ -4,24 +4,49 @@ from api.serializers import ProductSerializer, OrderSerializer, ProductsInfoSeri
 from api.models import Product, Order, OrderItem
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework import generics
 
-@api_view(['GET'])
+class ProductListAPIView(generics.ListAPIView):
+  #queryset = Product.objects.all() #get all products
+  queryset = Product.objects.filter(stock__gt=0) #get all products with stock greater than 0
+  #queryset = Product.objects.exclude(stock__gt=0) #get all products with stock equal to 0
+  serializer_class = ProductSerializer
+
+""" @api_view(['GET']) # As a function-based view
 def product_list(request):
   products = Product.objects.all()
-  serializer = ProductSerializer(products, many=True)
-  return Response(serializer.data)
+  serializer = ProductSerializer(products, many=True)s
+  return Response(serializer.data) """
 
-@api_view(['GET'])
+class ProductDetailAPIView(generics.RetrieveAPIView):
+  queryset = Product.objects.all()
+  serializer_class = ProductSerializer
+  #by default, the lookup field is 'pk'
+  lookup_url_kwarg = 'product_is'
+
+""" @api_view(['GET'])
 def product_detail(request, pk):
   product = get_object_or_404(Product, pk=pk)
   serializer = ProductSerializer(product)
-  return Response(serializer.data)
+  return Response(serializer.data) """
+  
+class OrderListAPIView(generics.ListAPIView):
+  queryset = Order.objects.prefetch_related('items__product')
+  serializer_class = OrderSerializer
 
-@api_view(['GET'])
+""" @api_view(['GET'])
 def order_list(request):
-  orders = Order.objects.all()
+  orders = Order.objects.prefetch_related('items__product')
   serializer = OrderSerializer(orders, many=True)
-  return Response(serializer.data)
+  return Response(serializer.data) """
+  
+class UserOrderListAPIView(generics.ListAPIView):
+  queryset = Order.objects.prefetch_related('items__product')
+  serializer_class = OrderSerializer
+  
+  def get_queryset(self):
+    qs = super().get_queryset()
+    return qs.filter(user=self.request.user)
 
 @api_view(['GET'])
 def product_info(request):
