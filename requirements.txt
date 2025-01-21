@@ -9,3 +9,4 @@ django-silk
 djangorestframework-simplejwt
 django-filter
 drf-spectacular
+isort

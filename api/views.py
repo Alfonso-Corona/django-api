@@ -8,10 +8,11 @@ from rest_framework import generics
 from rest_framework.permissions import (IsAuthenticated, IsAdminUser, AllowAny)
 from rest_framework.views import APIView
 from rest_framework import viewsets
-from api.filters import ProductFilter, InStockFilterBackend
+from api.filters import ProductFilter, InStockFilterBackend, OrderFilter
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
+from rest_framework.decorators import action
 
 class ProductListCreateAPIView(generics.ListCreateAPIView):
   #queryset = Product.objects.all()
@@ -78,8 +79,22 @@ def product_detail(request, pk):
 class OrderViesSet(viewsets.ModelViewSet):
   queryset = Order.objects.prefetch_related('items__product')
   serializer_class = OrderSerializer
-  permission_classes = [AllowAny]
+  #permission_classes = [AllowAny]
+  permission_classes = [IsAuthenticated]
   pagination_class = None
+  filterset_class = OrderFilter
+  filter_backends = [DjangoFilterBackend]
+  
+  @action(
+    detail=False, 
+    methods=['get'], 
+    url_path='user-orders', 
+    #permission_classes=[IsAuthenticated]
+    )
+  def user_orders(self, request):
+    orders = self.get_queryset().filter(user=request.user)
+    serializer = self.get_serializer(orders, many=True)
+    return Response(serializer.data)
   
 """ class OrderListAPIView(generics.ListAPIView):
   queryset = Order.objects.prefetch_related('items__product')
