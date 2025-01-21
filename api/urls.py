@@ -22,6 +22,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView
 )
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from rest_framework.routers import DefaultRouter
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,9 +34,9 @@ urlpatterns = [
     #path('products/<int:pk>', views.product_detail),
     path('products/<int:product_id>', views.ProductDetailAPIView.as_view()),
     #path('orders/', views.order_list),
-    path('orders/', views.OrderListAPIView.as_view()),
+    #path('orders/', views.OrderListAPIView.as_view()),
+    #path('user-orders/', views.UserOrderListAPIView.as_view(), name='user-orders'),
     path('silk/', include('silk.urls', namespace='silk')),
-    path('user-orders/', views.UserOrderListAPIView.as_view(), name='user-orders'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     
@@ -43,3 +44,7 @@ urlpatterns = [
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc')
 ]
+
+router = DefaultRouter()
+router.register('orders', views.OrderViesSet)
+urlpatterns += router.urls
