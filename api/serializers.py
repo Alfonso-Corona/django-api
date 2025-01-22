@@ -19,12 +19,12 @@ class UserSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
   class Meta:
     model = Product
-    """ fields = (
+    fields = (
       'name',
       'description',
       'price',
       'stock',
-    ) """
+    )
     
   def validate_price(self, value):
     if value <= 0:
