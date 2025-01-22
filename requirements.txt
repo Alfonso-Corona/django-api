@@ -10,3 +10,5 @@ djangorestframework-simplejwt
 django-filter
 drf-spectacular
 isort
+redis[hiredis]
+django-redis
